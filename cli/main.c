@@ -23,7 +23,7 @@ int main(void) {
     printf("mem_base_id: %u\n", module->mem_base_id);
     printf("glob_base_id: %u\n", module->glob_base_id);
     // link function
-    res = uwm_module_link_function(module, "env", "clock_ms", NULL);
+    res = uwm_module_link_raw_function(module, "env", "clock_ms", NULL);
     printf("link: %s.\n", res ? "succeed" : "failed");
     if (!res) {
         printf("error code: %d\n", uwm_get_last_error_code());

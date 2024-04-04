@@ -119,7 +119,6 @@ static bool uwm_module_seek_to_type(UWasmModule *module, uint32_t type_id) {
             return false;
         }
         // skip types
-        uint8_t buffer;
         uint32_t type_vec_size;
         while (type_id > 0) {
             type_id--;
@@ -222,12 +221,10 @@ bool uwm_module_link_function(UWasmModule *module, const char8_t *mod, const cha
             // matched
             uwm_log("linked function: %s.%s\n", mod, name);
             uwm_error_return_check_bool(import_type == 0x00, UWASM_ERROR_MODULE_FUNCTYPE_NOT_MATCHED, false);
-            uint32_t type_idx = uwm_module_read_uleb128(module);
+            __attribute__((unused)) uint32_t type_idx = uwm_module_read_uleb128(module);
             uwm_log("function type: %u\n", type_idx);
             // TODO: check function params type and return type
             // make function
-            UWasmLinkedFunction *func = UWASM_MALLOC(sizeof(UWasmLinkedFunction));
-            uwm_error_return_check_bool(func != NULL, UWASM_ERROR_MALLOC, false);
             func->func_id = func_id;
             func->next = NULL;
             // link function
