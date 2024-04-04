@@ -15,13 +15,13 @@ Status: WIP
 
 * [ ] Parse wasm module
     * [ ] Parse sections
-        * [*] Type section
-        * [*] Import section
+        * [x] Type section
+        * [x] Import section
         * [ ] Function section
         * [ ] Table section
         * [ ] Memory section
         * [ ] Global section
-        * [*] Export section
+        * [x] Export section
         * [ ] Start section
         * [ ] Element section
         * [ ] Code section
