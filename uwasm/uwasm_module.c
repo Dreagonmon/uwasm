@@ -182,8 +182,8 @@ bool uwm_find_exported_function(UWasmModule *module, const char8_t *name, uint32
     if (!uwm_module_seek_to_section(module, UWASM_SECTION_EXPORT)) {
         return false;
     }
-    uint32_t count = uwm_module_read_uleb128(module); // section size
-    count = uwm_module_read_uleb128(module);          // export count
+    uwm_module_read_uleb128(module); // skip section size
+    uint32_t count = uwm_module_read_uleb128(module);          // export count
     uint8_t buffer[UWASM_MAX_NAME_LENGTH];
     while (count) {
         count--;
