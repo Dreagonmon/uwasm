@@ -41,7 +41,7 @@ typedef int32_t uwm_ssize_t;
 bool uwm_port_module_open(UWasmModule *module, const char8_t *path);
 /**
  * close wasm module.
- * clean up.
+ * clean up extra data.
  */
 void uwm_port_module_close(UWasmModule *module);
 /**
@@ -59,5 +59,29 @@ bool uwm_port_module_seek(UWasmModule *module, uwm_ssize_t offset, uint8_t whenc
  * return zero or positive if succeed.
  */
 uwm_ssize_t uwm_port_module_tell(UWasmModule *module);
+
+/**
+ * create a 65536 bytes memory page.
+ * return true if succeed.
+ */
+bool uwm_port_memory_create(UWasmMemPage *mem);
+
+/**
+ * close a memory page.
+ * clean up extra data.
+ */
+void uwm_port_memory_close(UWasmMemPage *mem);
+
+/**
+ * read from a memory page.
+ * return true if succeed.
+ */
+bool uwm_port_memory_read(UWasmMemPage *mem, uint16_t offset, uint8_t *buffer, uwm_size_t len);
+
+/**
+ * write to a memory page.
+ * return true if succeed.
+ */
+bool uwm_port_memory_write(UWasmMemPage *mem, uint16_t offset, uint8_t *buffer, uwm_size_t len);
 
 #endif // UWASM_PORT_H

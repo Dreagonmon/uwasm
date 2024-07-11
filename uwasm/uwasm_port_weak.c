@@ -1,7 +1,6 @@
 #include "uwasm_port.h"
 
-__attribute__((weak)) bool uwm_port_module_open(__attribute__((unused)) UWasmModule *module,
-                                                __attribute__((unused)) const char8_t *path) {
+__attribute__((weak)) bool uwm_port_module_open(UWasmModule *module, __attribute__((unused)) const char8_t *path) {
     module->mod_base = NULL;
     module->mod_pos = NULL;
     module->mod_top = NULL;
@@ -45,4 +44,56 @@ __attribute__((weak)) bool uwm_port_module_seek(UWasmModule *module, uwm_ssize_t
 
 __attribute__((weak)) uwm_ssize_t uwm_port_module_tell(UWasmModule *module) {
     return module->mod_pos - module->mod_base;
+}
+
+__attribute__((weak)) bool uwm_port_memory_create(UWasmMemPage *mem) {
+    mem->extra = NULL;
+#if (UWASM_SUPPORT_HEAP)
+    mem->value = UWASM_MALLOC(UWASM_MEM_PAGE_SIZE);
+    if (mem->value == NULL) {
+        return false;
+    }
+#endif
+    return true;
+}
+
+__attribute__((weak)) void uwm_port_memory_close(UWasmMemPage *mem) {
+#if (UWASM_SUPPORT_HEAP)
+    if (mem->value) {
+        UWASM_FREE(mem->value);
+        mem->value = NULL;
+    }
+#endif
+}
+
+__attribute__((weak)) bool uwm_port_memory_read(UWasmMemPage *mem, uint16_t offset, uint8_t *buffer, uwm_size_t len) {
+    if (mem->value != NULL) {
+        uint8_t *mem8 = (uint8_t *)mem->value;
+        mem8 += offset;
+        while (len > 0) {
+            *buffer = *mem8;
+            mem8++;
+            buffer++;
+            len--;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+__attribute__((weak)) bool uwm_port_memory_write(UWasmMemPage *mem, uint16_t offset, uint8_t *buffer, uwm_size_t len) {
+    if (mem->value != NULL) {
+        uint8_t *mem8 = (uint8_t *)mem->value;
+        mem8 += offset;
+        while (len > 0) {
+            *mem8 = *buffer;
+            mem8++;
+            buffer++;
+            len--;
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
