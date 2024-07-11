@@ -4,55 +4,7 @@
 
 static const uint8_t MAGIC_HEADER[] = {'\0', 'a', 's', 'm'};
 
-static uint64_t uwm_module_read_integer_lsb(UWasmModule *module, uint8_t len) {
-    uint64_t num = 0;
-    uint8_t base = 0;
-    uint8_t buf;
-    while (base < len) {
-        uwm_port_module_read(module, &buf, 1);
-        num = num | ((uint64_t)buf << (base * 8));
-        base++;
-    }
-    return num;
-}
-
-static uint8_t uwm_module_read_byte(UWasmModule *module) {
-    uint8_t buf;
-    uwm_port_module_read(module, &buf, 1);
-    return buf;
-}
-
-static uint64_t uwm_module_read_uleb128(UWasmModule *module) {
-    uint64_t num = 0;
-    uint8_t base = 0;
-    uint8_t buf;
-    do {
-        uwm_port_module_read(module, &buf, 1);
-        num = num | ((uint64_t)(buf & 0b01111111) << base);
-        base += 7;
-    } while (buf & 0b10000000);
-    return num;
-}
-
-static int64_t uwm_module_read_sleb128(UWasmModule *module) {
-    uint64_t num = 0;
-    uint8_t base = 0;
-    uint8_t buf;
-    do {
-        uwm_port_module_read(module, &buf, 1);
-        num = num | ((uint64_t)(buf & 0b01111111) << base);
-        base += 7;
-    } while (buf & 0b10000000);
-    if (buf & 0b01000000) {
-        // nagetive
-        int64_t neg = num | (-(1 << base));
-        return neg;
-    } else {
-        // positive
-        return (int64_t)num;
-    }
-}
-
+/** skip 1 import element */
 static bool uwm_module_skip_import(UWasmModule *module, uint8_t import_type) {
     uint8_t limit_has_maxmium;
     switch (import_type) {
@@ -81,7 +33,7 @@ static bool uwm_module_skip_import(UWasmModule *module, uint8_t import_type) {
     return true;
 }
 
-static bool uwm_module_seek_to_section(UWasmModule *module, uint8_t section_id) {
+bool uwm_module_seek_to_section(UWasmModule *module, uint8_t section_id) {
     // skip header
     uwm_error_return_check_module_seek(module, 8, UWASM_SEEK_SET, false);
     // skip other sections
@@ -104,38 +56,7 @@ static bool uwm_module_seek_to_section(UWasmModule *module, uint8_t section_id) 
     uwm_error_return(UWASM_ERROR_MODULE_SECTION_NOT_FOUND, false);
 }
 
-static bool uwm_module_seek_to_type(UWasmModule *module, uint32_t type_id) {
-    if (!uwm_module_seek_to_section(module, UWASM_SECTION_TYPE)) {
-        return false;
-    }
-    uint32_t section_size = uwm_module_read_uleb128(module);
-    if (section_size > 0) {
-        // read function type one by one
-        uint32_t type_count = uwm_module_read_uleb128(module);
-        // uwm_log("type count: %u\n", type_count);
-        if (type_id >= type_count) {
-            // not found
-            uwm_set_last_error_code(UWASM_ERROR_MODULE_FUNCTYPE_NOT_FOUND);
-            return false;
-        }
-        // skip types
-        uint32_t type_vec_size;
-        while (type_id > 0) {
-            type_id--;
-            uwm_error_return_check_module_seek(module, 1, UWASM_SEEK_CUR, false);
-            type_vec_size = uwm_module_read_uleb128(module);
-            uwm_error_return_check_module_seek(module, type_vec_size, UWASM_SEEK_CUR, false);
-            type_vec_size = uwm_module_read_uleb128(module);
-            uwm_error_return_check_module_seek(module, type_vec_size, UWASM_SEEK_CUR, false);
-        }
-        // check 1 byte
-        uint8_t b = uwm_module_read_byte(module);
-        uwm_error_return_check_bool(b == 0x80, UWASM_ERROR_MODULE_INVALID, false);
-        return true;
-    }
-    // not found
-    uwm_error_return(UWASM_ERROR_MODULE_FUNCTYPE_NOT_FOUND, false);
-}
+/* ========================================================================== */
 
 bool uwm_compile_module(UWasmModule *module) {
     uwm_error_return_check_module_seek(module, 0, UWASM_SEEK_SET, false);
@@ -151,22 +72,26 @@ bool uwm_compile_module(UWasmModule *module) {
     // uwm_log("wasm version: %u\n", version);
     // parse minimal function/table/mem/global id
     do {
+        // read section id
         count = uwm_port_module_read(module, buffer, 1);
         if (count <= 0) {
             break;
         }
         uint32_t section_size = uwm_module_read_uleb128(module);
-        if (buffer[0] == UWASM_SECTION_IMPORT) {
+        uint32_t import_count, len;
+        uint8_t import_type;
+        switch (buffer[0]) {
+        case UWASM_SECTION_IMPORT:
             // check import, generate minimal id
-            uint32_t import_count = uwm_module_read_uleb128(module);
+            import_count = uwm_module_read_uleb128(module);
             while (import_count) {
                 import_count--;
-                uint32_t len = uwm_module_read_uleb128(module); // mod
+                len = uwm_module_read_uleb128(module); // mod
                 uwm_error_return_check_module_seek(module, len, UWASM_SEEK_CUR, false);
                 len = uwm_module_read_uleb128(module); // name
                 uwm_error_return_check_module_seek(module, len, UWASM_SEEK_CUR, false);
-                uint8_t import_type = uwm_module_read_byte(module);
-                switch (import_count) {
+                import_type = uwm_module_read_byte(module);
+                switch (import_type) {
                 case 0x00:
                     module->func_base_id++;
                     break;
@@ -184,9 +109,11 @@ bool uwm_compile_module(UWasmModule *module) {
                     return false;
                 }
             }
-        } else {
+            break;
+        default:
             // skip
             uwm_error_return_check_module_seek(module, (uwm_ssize_t)section_size, UWASM_SEEK_CUR, false);
+            break;
         }
     } while (count > 0);
     // TODO: cache and speed up.

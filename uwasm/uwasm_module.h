@@ -4,6 +4,11 @@
 #include "uwasm_core.h"
 #include "uwasm_port.h"
 
+/* ==== internal ==== */
+/** seek to section start (before section size uleb128). */
+bool uwm_module_seek_to_section(UWasmModule *module, uint8_t section_id);
+
+/* export */
 /**
  * parse module
  */

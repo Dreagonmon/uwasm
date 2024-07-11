@@ -15,9 +15,10 @@ OBJ := $(SRC:%.c=$(BUILD)/%.o)
 
 # target
 CFLAGS += -std=c11
-CFLAGS += -Wall -Wextra
+CFLAGS += -Wall
 # opt
 ifdef DEBUG
+CFLAGS += -Wextra -Werror
 CFLAGS += -O0 -g -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls
 CFLAGS += -D UWASM_DEBUG=1
 CFLAGS += -Wno-unused -Wno-unused-parameter

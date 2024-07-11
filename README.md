@@ -9,15 +9,17 @@ Status: WIP
 * Can use software virtual memory.
 * Can run module without loading the whole module into the memory.
 * Less heap useage.
-* Don't need to pass all the wasm spec test.
+* Don't need to pass all the wasm spec test. Only minimal feature are there.
 
 ## Roadmap
 
 * [ ] Parse wasm module
     * [ ] Parse sections
         * [x] Type section
-        * [x] Import section
-        * [ ] Function section
+        * [ ] Import section
+            * [x] Import Function
+            * [ ] Import Memory
+        * [x] Function section
         * [ ] Table section
         * [ ] Memory section
         * [ ] Global section

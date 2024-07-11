@@ -1,4 +1,5 @@
 #include "uwasm_module.h"
+#include "uwasm_func.h"
 #include "uwasm_error.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -37,6 +38,12 @@ int main(void) {
         printf("error code: %d\n", uwm_get_last_error_code());
     }
     printf("exported_func: %u\n", func_id);
+    // test
+    printf("================\n");
+    res = uwm_module_seek_to_function_type(module, 15);
+    if (!res) {
+        printf("error code: %d\n", uwm_get_last_error_code());
+    }
     // init runtime
     // destory
     uwm_destory_module(module);
