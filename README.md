@@ -23,7 +23,9 @@ Status: WIP
         * [ ] Table section
         * [x] Memory section
         * [ ] Global section
-        * [x] Export section
+        * [ ] Export section
+            * [x] Export Function
+            * [ ] Export Other
         * [ ] Start section
         * [ ] Element section
         * [ ] Code section
