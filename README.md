@@ -21,7 +21,7 @@ Status: WIP
             * [ ] Import Memory
         * [x] Function section
         * [ ] Table section
-        * [ ] Memory section
+        * [x] Memory section
         * [ ] Global section
         * [x] Export section
         * [ ] Start section
