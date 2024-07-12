@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #define MAX_MODULE_SIZE (65536)
+#define MODULE_STACK_SIZE (4096)
 
 bool uwm_port_module_open(UWasmModule *module, const char8_t *path) {
     FILE *fp = fopen(path, "rb");
@@ -54,5 +55,27 @@ void uwm_port_module_close(UWasmModule *module) {
         FILE *fp = module->extra;
         fclose(fp);
         module->extra = NULL;
+    }
+}
+
+bool uwm_port_stack_create(UWasmModule *module) {
+    UWasmValue *stack = UWASM_MALLOC(sizeof(UWasmValue) * MODULE_STACK_SIZE);
+    if (stack == NULL) {
+        return false;
+    }
+    module->stack_base = stack;
+    module->stack_pos = stack;
+    module->stack_top = stack + MODULE_STACK_SIZE;
+    module->stack_return_pos = stack;
+    return true;
+}
+
+void uwm_port_stack_close(UWasmModule *module) {
+    if (module->stack_base != NULL) {
+        UWASM_FREE(module->stack_base);
+        module->stack_base = NULL;
+        module->stack_pos = NULL;
+        module->stack_top = NULL;
+        module->stack_return_pos = NULL;
     }
 }

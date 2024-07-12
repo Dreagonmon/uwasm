@@ -46,6 +46,30 @@ __attribute__((weak)) uwm_ssize_t uwm_port_module_tell(UWasmModule *module) {
     return module->mod_pos - module->mod_base;
 }
 
+__attribute__((weak)) bool uwm_port_stack_create(UWasmModule *module) {
+    module->stack_base = NULL;
+    module->stack_pos = NULL;
+    module->stack_top = NULL;
+    module->stack_return_pos = NULL;
+    return true;
+}
+
+__attribute__((weak)) void uwm_port_stack_close(__attribute__((unused)) UWasmModule *module) { return; }
+
+__attribute__((weak)) bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, UWasmValue *dest) {
+    if (pos >= module->stack_base && pos < module->stack_top) {
+        *dest = *pos;
+    }
+    return false;
+}
+
+__attribute__((weak)) bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, UWasmValue *source) {
+    if (pos >= module->stack_base && pos < module->stack_top) {
+        *pos = *source;
+    }
+    return false;
+}
+
 __attribute__((weak)) bool uwm_port_memory_create(UWasmMemPage *mem) {
     mem->extra = NULL;
 #if (UWASM_SUPPORT_HEAP)

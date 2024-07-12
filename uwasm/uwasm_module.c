@@ -212,7 +212,13 @@ bool uwm_init_module(UWasmModule *module, const char8_t *path) {
     module->mem_base_id = 0;
     module->glob_base_id = 0;
     uwm_error_return_check_bool(uwm_port_module_open(module, path), UWASM_ERROR_MODULE_OPEN, false);
+    uwm_error_return_check_bool(uwm_port_stack_create(module), UWASM_ERROR_MODULE_OPEN, false);
     return true;
+}
+
+void uwm_deinit_module(UWasmModule *module) {
+    uwm_port_module_close(module);
+    uwm_port_stack_close(module);
 }
 
 #if (UWASM_SUPPORT_HEAP)
@@ -239,7 +245,7 @@ UWasmModule *uwm_new_module(const char8_t *path, void *extra) {
 
 void uwm_destory_module(UWasmModule *module) {
     if (module != NULL) {
-        uwm_port_module_close(module);
+        uwm_deinit_module(module);
         // functions
         UWasmLinkedFunction *func = module->linked_func;
         while (func != NULL) {

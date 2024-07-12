@@ -39,26 +39,54 @@ typedef int32_t uwm_ssize_t;
  * return true if succeed.
  */
 bool uwm_port_module_open(UWasmModule *module, const char8_t *path);
+
 /**
  * close wasm module.
  * clean up extra data.
  */
 void uwm_port_module_close(UWasmModule *module);
+
 /**
  * read wasm module. like fread().
  * return bytes being read.
  */
 uwm_size_t uwm_port_module_read(UWasmModule *module, uint8_t *buffer, uwm_size_t len);
+
 /**
  * seek wasm module. like fseek().
  * return true if succeed.
  */
 bool uwm_port_module_seek(UWasmModule *module, uwm_ssize_t offset, uint8_t whence);
+
 /**
  * tell wasm module position. like ftell().
  * return zero or positive if succeed.
  */
 uwm_ssize_t uwm_port_module_tell(UWasmModule *module);
+
+/**
+ * create stack in module.
+ * return true if succeed.
+ */
+bool uwm_port_stack_create(UWasmModule *module);
+
+/**
+ * close stack in module.
+ * clean up stack.
+ */
+void uwm_port_stack_close(UWasmModule *module);
+
+/**
+ * read from a stack position.
+ * return true if succeed.
+ */
+bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, UWasmValue *dest);
+
+/**
+ * write to a stack position.
+ * return true if succeed.
+ */
+bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, UWasmValue *source);
 
 /**
  * create a 65536 bytes memory page.

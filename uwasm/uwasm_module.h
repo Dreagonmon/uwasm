@@ -25,6 +25,10 @@ bool uwm_find_exported_function(UWasmModule *module, const char8_t *name, uint32
  * init module struct
  */
 bool uwm_init_module(UWasmModule *module, const char8_t *path);
+/**
+ * deinit module struct
+ */
+void uwm_deinit_module(UWasmModule *module);
 
 #if (UWASM_SUPPORT_HEAP)
 

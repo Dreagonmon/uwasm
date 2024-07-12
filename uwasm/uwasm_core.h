@@ -34,6 +34,14 @@ typedef char char8_t;
 // typedef unsigned char char8_t;
 #endif
 
+typedef union UWasmValue {
+    int32_t i32;
+    uint32_t u32;
+    float f32;
+    double f64;
+    void *pointer;
+} UWasmValue;
+
 typedef struct UWasmPNode {
     void *value;
     struct UWasmPNode *next;
@@ -52,18 +60,14 @@ typedef struct UWasmLinkedFunction {
     struct UWasmLinkedFunction *next;
 } UWasmLinkedFunction;
 
-typedef struct UWasmRuntime {
-    uint8_t *stack_base;
-    uint8_t *stack_pos;
-    uint8_t *stack_top;
-    UWasmMem *mems;
-    void *extra;
-} UWasmRuntime;
-
 typedef struct UWasmModule {
     uint8_t *mod_base;
     uint8_t *mod_pos;
     uint8_t *mod_top;
+    UWasmValue *stack_base;
+    UWasmValue *stack_pos;
+    UWasmValue *stack_top;
+    UWasmValue *stack_return_pos;
     UWasmLinkedFunction *linked_func;
     UWasmMem *mem;
     void *extra;
