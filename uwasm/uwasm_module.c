@@ -212,7 +212,7 @@ bool uwm_init_module(UWasmModule *module, const char8_t *path) {
     module->mem_base_id = 0;
     module->glob_base_id = 0;
     uwm_error_return_check_bool(uwm_port_module_open(module, path), UWASM_ERROR_MODULE_OPEN, false);
-    uwm_error_return_check_bool(uwm_port_stack_create(module), UWASM_ERROR_MODULE_OPEN, false);
+    uwm_error_return_check_bool(uwm_port_stack_create(module), UWASM_ERROR_MODULE_STACK_CREATE, false);
     return true;
 }
 

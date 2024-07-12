@@ -17,6 +17,7 @@ typedef enum UWasmErrorCode {
     UWASM_ERROR_MODULE_FUNCTYPE_NOT_FOUND,
     UWASM_ERROR_MODULE_NAME_TOO_LONG,
     UWASM_ERROR_MODULE_MEMORY_NOT_FOUND,
+    UWASM_ERROR_MODULE_STACK_CREATE,
 } UWasmErrorCode;
 
 void uwm_set_last_error_code(UWasmErrorCode code);

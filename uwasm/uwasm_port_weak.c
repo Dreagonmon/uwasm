@@ -59,6 +59,7 @@ __attribute__((weak)) void uwm_port_stack_close(__attribute__((unused)) UWasmMod
 __attribute__((weak)) bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, UWasmValue *dest) {
     if (pos >= module->stack_base && pos < module->stack_top) {
         *dest = *pos;
+        return true;
     }
     return false;
 }
@@ -66,6 +67,7 @@ __attribute__((weak)) bool uwm_port_stack_read(UWasmModule *module, UWasmValue *
 __attribute__((weak)) bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, UWasmValue *source) {
     if (pos >= module->stack_base && pos < module->stack_top) {
         *pos = *source;
+        return true;
     }
     return false;
 }
