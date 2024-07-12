@@ -47,26 +47,34 @@ __attribute__((weak)) uwm_ssize_t uwm_port_module_tell(UWasmModule *module) {
 }
 
 __attribute__((weak)) bool uwm_port_stack_create(UWasmModule *module) {
+    module->stack_type_base = NULL;
     module->stack_base = NULL;
     module->stack_pos = NULL;
     module->stack_top = NULL;
     module->stack_return_pos = NULL;
+    module->stack_global_pos = NULL;
     return true;
 }
 
 __attribute__((weak)) void uwm_port_stack_close(__attribute__((unused)) UWasmModule *module) { return; }
 
-__attribute__((weak)) bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, UWasmValue *dest) {
+__attribute__((weak)) bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, uint8_t *itype_dest,
+                                               UWasmValue *dest) {
     if (pos >= module->stack_base && pos < module->stack_top) {
         *dest = *pos;
+        uint8_t *stack_type = module->stack_type_base + (pos - module->stack_base);
+        *itype_dest = *stack_type;
         return true;
     }
     return false;
 }
 
-__attribute__((weak)) bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, UWasmValue *source) {
+__attribute__((weak)) bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, uint8_t *itype_source,
+                                                UWasmValue *source) {
     if (pos >= module->stack_base && pos < module->stack_top) {
         *pos = *source;
+        uint8_t *stack_type = module->stack_type_base + (pos - module->stack_base);
+        *stack_type = *itype_source;
         return true;
     }
     return false;

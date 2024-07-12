@@ -35,6 +35,7 @@ typedef char char8_t;
 #endif
 
 typedef union UWasmValue {
+    uint8_t type;
     int32_t i32;
     uint32_t u32;
     float f32;
@@ -64,10 +65,12 @@ typedef struct UWasmModule {
     uint8_t *mod_base;
     uint8_t *mod_pos;
     uint8_t *mod_top;
+    uint8_t *stack_type_base; // the same count of stack_base
     UWasmValue *stack_base;
     UWasmValue *stack_pos;
     UWasmValue *stack_top;
     UWasmValue *stack_return_pos;
+    UWasmValue *stack_global_pos;
     UWasmLinkedFunction *linked_func;
     UWasmMem *mem;
     void *extra;

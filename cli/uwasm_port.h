@@ -80,13 +80,13 @@ void uwm_port_stack_close(UWasmModule *module);
  * read from a stack position.
  * return true if succeed.
  */
-bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, UWasmValue *dest);
+bool uwm_port_stack_read(UWasmModule *module, UWasmValue *pos, uint8_t *itype, UWasmValue *dest);
 
 /**
  * write to a stack position.
  * return true if succeed.
  */
-bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, UWasmValue *source);
+bool uwm_port_stack_write(UWasmModule *module, UWasmValue *pos, uint8_t *itype, UWasmValue *source);
 
 /**
  * create a 65536 bytes memory page.

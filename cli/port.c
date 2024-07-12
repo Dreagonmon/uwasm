@@ -28,7 +28,7 @@ bool uwm_port_module_open(UWasmModule *module, const char8_t *path) {
         uint8_t *buffer = UWASM_MALLOC(MAX_MODULE_SIZE);
         size_t count = fread(buffer, 1, f_size, fp);
         // uwm_log("read %d\n", res);
-        if (count != (size_t) f_size) {
+        if (count != (size_t)f_size) {
             fclose(fp);
             UWASM_FREE(buffer);
             return false;
@@ -63,19 +63,29 @@ bool uwm_port_stack_create(UWasmModule *module) {
     if (stack == NULL) {
         return false;
     }
+    uint8_t *stack_type = UWASM_MALLOC(sizeof(uint8_t) * MODULE_STACK_SIZE);
+    if (stack_type == NULL) {
+        UWASM_FREE(stack);
+        return false;
+    }
+    module->stack_type_base = stack_type;
     module->stack_base = stack;
     module->stack_pos = stack;
     module->stack_top = stack + MODULE_STACK_SIZE;
     module->stack_return_pos = stack;
+    module->stack_global_pos = stack;
     return true;
 }
 
 void uwm_port_stack_close(UWasmModule *module) {
     if (module->stack_base != NULL) {
         UWASM_FREE(module->stack_base);
+        UWASM_FREE(module->stack_type_base);
+        module->stack_type_base = NULL;
         module->stack_base = NULL;
         module->stack_pos = NULL;
         module->stack_top = NULL;
         module->stack_return_pos = NULL;
+        module->stack_global_pos = NULL;
     }
 }
